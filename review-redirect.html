@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave a Review</title>
+<style>
+  :root {
+    --ink: #14302b;
+    --ink-soft: #4a635d;
+    --paper: #f6f4ee;
+    --card: #ffffff;
+    --accent: #1f6f5c;
+    --accent-dark: #164f42;
+    --line: #dedad0;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--paper);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border-radius: 20px;
+    padding: 32px 24px 28px;
+    box-shadow: 0 1px 3px rgba(20,48,43,0.06), 0 12px 32px rgba(20,48,43,0.08);
+  }
+
+  .step {
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 21px;
+    line-height: 1.3;
+    margin: 0 0 6px;
+  }
+
+  .sub {
+    font-size: 14.5px;
+    color: var(--ink-soft);
+    margin: 0 0 20px;
+    line-height: 1.45;
+  }
+
+  .stars {
+    letter-spacing: 3px;
+    color: #e0a530;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+
+  .review-box {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 16px 16px 14px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 18px;
+    white-space: pre-wrap;
+  }
+
+  .review-box .hint {
+    display: block;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  button {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 15px 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease;
+  }
+
+  #copyBtn {
+    background: var(--accent);
+    color: #fff;
+  }
+  #copyBtn:active { transform: scale(0.98); }
+  #copyBtn.copied { background: var(--accent-dark); }
+
+  .go-note {
+    margin-top: 14px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-align: center;
+    min-height: 18px;
+  }
+
+  .fallback {
+    margin-top: 4px;
+    display: inline-block;
+    color: var(--accent);
+    text-decoration: underline;
+    font-weight: 600;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .logo-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--accent);
+  }
+  .biz-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink-soft);
+    letter-spacing: 0.01em;
+  }
+</style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="logo-row">
+      <span class="logo-dot"></span>
+      <span class="biz-name" id="bizName">Your Business Name</span>
+    </div>
+
+    <div class="step">Step 1 of 2</div>
+    <h1>Thanks for stopping by — mind leaving us a review?</h1>
+    <p class="sub">Tap below to copy a starting point. It'll open Google right after so you can paste and post.</p>
+
+    <div class="review-box">
+      <span class="hint">Suggested review — feel free to edit it</span>
+      <span id="reviewText"></span>
+    </div>
+
+    <button id="copyBtn">Copy review &amp; continue to Google</button>
+    <div class="go-note" id="goNote"></div>
+  </div>
+
+<script>
+  // ====== EDIT THESE VALUES FOR YOUR BUSINESS ======
+  const BUSINESS_NAME = "Shivam Precast";
+  const GOOGLE_REVIEW_URL = "https://g.page/r/REPLACE_WITH_YOUR_ID/review"; // your real Google review link
+
+  // Add as many variations as you like — one is picked at random per visitor,
+  // so customers aren't all pasting identical wording.
+  const REVIEW_VARIANTS = [
+    "Really happy with the service here — friendly staff, quick turnaround, and great attention to detail. Would definitely recommend to anyone in the area.",
+    "Great experience from start to finish. The team was helpful, everything was handled quickly, and the quality was exactly what I hoped for.",
+    "Came here on a recommendation and wasn't disappointed. Professional, efficient, and clearly care about doing a good job.",
+    "Smooth, friendly service and worth every penny. I'll be coming back and recommending this place to others."
+  ];
+  // =========================================================
+
+  const REVIEW_TEXT = REVIEW_VARIANTS[Math.floor(Math.random() * REVIEW_VARIANTS.length)];
+
+  document.getElementById('bizName').textContent = BUSINESS_NAME;
+  document.getElementById('reviewText').textContent = REVIEW_TEXT;
+
+  const btn = document.getElementById('copyBtn');
+  const note = document.getElementById('goNote');
+
+  btn.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(REVIEW_TEXT);
+    } catch (err) {
+      // Clipboard API can fail on some in-app browsers (e.g. Instagram/Facebook webview)
+      const ta = document.createElement('textarea');
+      ta.value = REVIEW_TEXT;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      try { document.execCommand('copy'); } catch (e2) {}
+      document.body.removeChild(ta);
+    }
+
+    btn.textContent = "Copied! Opening Google…";
+    btn.classList.add('copied');
+    note.innerHTML = 'Didn\'t redirect? <a class="fallback" href="' + GOOGLE_REVIEW_URL + '">Tap here to open Google reviews</a>';
+
+    setTimeout(() => {
+      window.location.href = GOOGLE_REVIEW_URL;
+    }, 700);
+  });
+</script>
+
+</body>
+</html>
